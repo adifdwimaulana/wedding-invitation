@@ -1,0 +1,6 @@
+.DS_Store
+.netlify/
+.vercel/
+
+# Local browser-automation artifacts
+.playwright-cli/
