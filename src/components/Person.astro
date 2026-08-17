@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { Person } from '../data/wedding';
+
+interface Props {
+  person: Person;
+  /** Flips the photo to the right of the text on wide screens. */
+  side: 'groom' | 'bride';
+  photo: string;
+}
+
+const { person, side, photo } = Astro.props;
+---
+
+<div class={`person person--${side}`} data-stagger="150">
+  <div class="shot reveal">
+    <Image
+      class="px"
+      data-parallax="24"
+      src={photo}
+      alt={`Foto ${person.full}`}
+      width={900}
+      height={1125}
+      loading="lazy"
+    />
+  </div>
+
+  <div class="reveal">
+    <p class="person-role">{person.role}</p>
+    <h3 class="person-name">{person.full}</h3>
+    <p class="person-parents">
+      {person.order}<br />
+      <strong>Bapak {person.father}</strong> &amp; <strong>Ibu {person.mother}</strong>
+    </p>
+
+    {person.instagram && (
+      <a class="ig" href={person.instagram} target="_blank" rel="noopener noreferrer">
+        <Icon name="instagram" />
+        Instagram
+      </a>
+    )}
+  </div>
+</div>

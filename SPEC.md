@@ -529,7 +529,60 @@ Phase 1 and 2 are where visual regressions hide. Compare screenshots at all four
 
 ---
 
-## 17. References
+## 17. Implementation notes
+
+Recorded after building this out, covering the places reality differed from the plan above.
+
+### 17.1 Netlify's Image CDN has its own allowlist
+
+`image.remotePatterns` in `astro.config.mjs` only governs Astro's own validation. The Netlify Image CDN — which is what actually serves the images, since the adapter rewrites every `<Image>` to `/.netlify/images?url=…` — keeps a separate allowlist in `netlify.toml`:
+
+```toml
+[images]
+  remote_images = ["https://picsum\\.photos/.*"]
+```
+
+Without it every remote image returns `403 Forbidden: Remote image URL not allowed`, in production as well as under `netlify dev`. Both entries can be deleted together once the photos live in `src/assets/`.
+
+### 17.2 Empty form fields need preprocessing, not just `.nullable()`
+
+§8 noted that empty fields arrive as `null` rather than `""`. The consequence is sharper than expected: `z.string().min(1, 'Mohon isi nama')` never reaches `min()`, so a blank submit surfaces Zod's English `"Invalid input: expected string, received null"` instead of the Indonesian message. Every required field is wrapped:
+
+```ts
+const requiredText = (max: number, message: string) =>
+  z.preprocess(
+    (value) => (typeof value === 'string' ? value.trim() : ''),
+    z.string().min(1, message).max(max, `Maksimal ${max} karakter`),
+  );
+```
+
+This also collapses whitespace-only input to a validation failure, which `.trim().min(1)` alone would not do given the `null` short-circuit.
+
+### 17.3 CSRF protection is on by default
+
+Astro rejects POSTs to actions whose `Origin` header does not match the site, with `403 Cross-site POST form submissions are forbidden`. Nothing to configure, but it means testing actions with `curl` requires an explicit `-H "Origin: …"`.
+
+### 17.4 `src=""` on the lightbox image costs a request
+
+An `<img src="">` resolves to the current document URL, so the empty lightbox placeholder fired a wasted request for the whole HTML page on every load. The attribute is now omitted entirely and removed with `removeAttribute('src')` on close rather than set to `''`.
+
+### 17.5 Timezone must be pinned when formatting wishes
+
+Netlify functions run in UTC, so `toLocaleString('id-ID')` in the server island rendered every timestamp seven hours early. `wishTimeLabel()` in `src/lib/time.ts` pins `timeZone: 'Asia/Jakarta'` and is shared by the island and the optimistic client-side prepend, so both agree.
+
+### 17.6 Countdown target is read from the DOM
+
+Rather than importing `wedding.ts` into the client bundle, `Countdown.astro` renders `data-start` and `scripts/countdown.ts` reads it. The rendered date and the countdown target cannot drift apart, and the content module stays out of the client payload.
+
+### 17.7 Deferred from this pass
+
+- **Phase 6** is partly done: the image pipeline runs through `astro:assets` and the Netlify Image CDN, but the sources are still `picsum.photos` placeholders and the audio is still hotlinked. Swapping in real files is now a per-file change with no structural work.
+- **Phase 7** (deploy plus real WhatsApp verification on iOS and Android) needs a live deploy, so F10 and F13 remain unverified.
+- The open questions in §16 are unchanged. Admin access is still the practical gap: RSVPs are only readable via the Netlify CLI or dashboard.
+
+---
+
+## 18. References
 
 Verified 17 August 2026.
 
@@ -542,3 +595,4 @@ Verified 17 August 2026.
 - [Netlify Blobs](https://docs.netlify.com/build/data-and-storage/netlify-blobs/)
 - [Goodbye Astro Studio](https://astro.build/blog/goodbye-astro-studio/)
 - [Images guide](https://docs.astro.build/en/guides/images/)
+- [Netlify Image CDN remote paths](https://docs.netlify.com/build/image-cdn/overview/#remote-path)

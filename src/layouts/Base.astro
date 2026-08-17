@@ -1,0 +1,69 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/components.css';
+
+import { coupleNames, wedding } from '../data/wedding';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `Undangan Pernikahan — ${coupleNames} · 25 Oktober 2026`,
+  description = `Dengan penuh rasa syukur, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri pernikahan ${coupleNames}. ${wedding.dateLabel} di ${wedding.venueFull}.`,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+// [PLACEHOLDER] Replace with a real 1200x630 card once photos exist.
+const ogImage = new URL('/og.jpg', Astro.site);
+
+const favicon =
+  "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23243019'/><text x='16' y='23' text-anchor='middle' font-family='Georgia,serif' font-size='19' font-style='italic' fill='%23F4F2E7'>%26</text></svg>";
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#FBFAF6" />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={favicon} />
+
+    {/* Open Graph drives the WhatsApp link preview card. */}
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:site_name" content={coupleNames} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={`Undangan Pernikahan ${coupleNames}`} />
+    <meta
+      property="og:description"
+      content={`${wedding.dateLabel} · ${wedding.venueFull}. Merupakan suatu kehormatan apabila Bapak/Ibu/Saudara/i berkenan hadir.`}
+    />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+    />
+  </head>
+
+  <!-- is-locked keeps the page unscrollable until the guest opens the invitation -->
+  <body class="is-locked">
+    <slot />
+
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>

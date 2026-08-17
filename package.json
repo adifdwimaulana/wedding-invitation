@@ -1,0 +1,27 @@
+{
+  "name": "wedding-invitation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Undangan pernikahan digital Adif & Anggun",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "netlify dev",
+    "dev:astro": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/netlify": "^8.2.1",
+    "@netlify/blobs": "^10.7.13",
+    "astro": "^7.2.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "netlify-cli": "^27.1.1",
+    "typescript": "^6.0.3"
+  }
+}

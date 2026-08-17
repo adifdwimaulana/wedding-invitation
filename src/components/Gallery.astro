@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets';
+
+/**
+ * [PLACEHOLDER] Replace all eight sources with real pre-wedding photos from
+ * src/assets/gallery/. `shape` drives the uneven grid.
+ */
+const photos = [
+  { seed: 'aa-g1', shape: 'gitem--w', w: 1200, h: 840 },
+  { seed: 'aa-g2', shape: '', w: 800, h: 1067 },
+  { seed: 'aa-g3', shape: '', w: 800, h: 1067 },
+  { seed: 'aa-g4', shape: 'gitem--sq', w: 900, h: 900 },
+  { seed: 'aa-g5', shape: 'gitem--sq', w: 900, h: 900 },
+  { seed: 'aa-g6', shape: '', w: 800, h: 1067 },
+  { seed: 'aa-g7', shape: 'gitem--w', w: 1200, h: 840 },
+  { seed: 'aa-g8', shape: '', w: 800, h: 1067 },
+];
+---
+
+<section id="galeri" class="section-pad">
+  <div class="wrap wrap--wide">
+    <div class="center reveal">
+      <p class="label">Galeri</p>
+      <h2 class="h-sec">Momen Kami</h2>
+      <p class="lede">Sentuh salah satu foto untuk memperbesar.</p>
+      <div class="rule--short" aria-hidden="true"></div>
+    </div>
+
+    <div class="gallery" id="gallery" data-stagger="80">
+      {photos.map((photo, i) => (
+        <button class={`gitem reveal ${photo.shape}`.trim()} type="button">
+          <Image
+            src={`https://picsum.photos/seed/${photo.seed}/${photo.w}/${photo.h}`}
+            alt={`Momen Adif dan Anggun ${i + 1}`}
+            width={photo.w}
+            height={photo.h}
+            loading="lazy"
+          />
+        </button>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,13 @@
+---
+import Icon from './Icon.astro';
+
+// [PLACEHOLDER] Self-host the real track at public/audio/backsound.mp3 and
+// switch src to "/audio/backsound.mp3". Hotlinking is only for the placeholder.
+const track = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+---
+
+<button id="music" type="button" aria-label="Putar musik latar" aria-pressed="false">
+  <Icon name="music" />
+</button>
+
+<audio id="audio" loop preload="none" src={track}></audio>

@@ -1,0 +1,61 @@
+---
+import { actions } from 'astro:actions';
+import Wishes from './Wishes.astro';
+import WishesSkeleton from './WishesSkeleton.astro';
+---
+
+<section id="ucapan" class="section-pad">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="label">Ucapan &amp; Doa</p>
+      <h2 class="h-sec">Buku Tamu</h2>
+      <p class="lede">Tinggalkan ucapan dan doa terbaik Anda untuk kami berdua.</p>
+    </div>
+
+    <div class="card form-card reveal">
+      <form id="wishForm" method="POST" action={actions.wish}>
+        <label class="field" style="margin-top:0">
+          <span>Nama</span>
+          <input
+            class="input"
+            type="text"
+            name="nama"
+            id="wishNama"
+            placeholder="Nama Anda"
+            autocomplete="name"
+            maxlength="80"
+            required
+          />
+        </label>
+
+        <label class="field">
+          <span>Ucapan</span>
+          <textarea
+            class="input"
+            name="pesan"
+            id="wishPesan"
+            placeholder="Tuliskan ucapan dan doa Anda&hellip;"
+            maxlength="500"
+            required></textarea>
+        </label>
+
+        <div class="trap" aria-hidden="true">
+          <label>
+            Jangan diisi
+            <input type="text" name="honeypot" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
+
+        <p style="margin-top:30px">
+          <button class="btn btn--wide" type="submit" id="wishSubmit">Kirim Ucapan</button>
+        </p>
+      </form>
+    </div>
+
+    {/* Deferred so the list is fresh on every visit without making the whole
+        page server-rendered. */}
+    <Wishes server:defer>
+      <WishesSkeleton slot="fallback" />
+    </Wishes>
+  </div>
+</section>
