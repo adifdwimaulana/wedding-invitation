@@ -1,0 +1,23 @@
+---
+import { wedding } from '../data/wedding';
+
+const units = [
+  { id: 'cdD', label: 'Hari' },
+  { id: 'cdH', label: 'Jam' },
+  { id: 'cdM', label: 'Menit' },
+  { id: 'cdS', label: 'Detik' },
+];
+---
+
+{/* data-start is the single source the client reads, so the rendered date and
+    the countdown target cannot drift apart. */}
+<div class="countdown" id="countdown" data-start={wedding.akadStart} aria-live="off">
+  {units.map((unit) => (
+    <div class="cd-cell">
+      <span class="cd-num" id={unit.id}>00</span>
+      <span class="cd-lab">{unit.label}</span>
+    </div>
+  ))}
+</div>
+
+<div class="cd-done" id="cdDone" hidden>Alhamdulillah, hari bahagia telah tiba.</div>

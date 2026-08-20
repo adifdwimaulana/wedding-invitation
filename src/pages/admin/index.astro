@@ -1,0 +1,198 @@
+---
+// Must render per request: it reads a session and live Blobs data.
+export const prerender = false;
+
+import { actions, isActionError } from 'astro:actions';
+import Admin from '../../layouts/Admin.astro';
+import { isAdmin } from '../../lib/auth';
+import { listAllWishes, listRsvps } from '../../lib/blobs';
+import { adminTimeLabel } from '../../lib/time';
+import { summarise } from '../../lib/summary';
+
+const loginResult = Astro.getActionResult(actions.login);
+const logoutResult = Astro.getActionResult(actions.logout);
+const removeResult = Astro.getActionResult(actions.removeWish);
+
+// POST-redirect-GET. Without it the browser keeps ?_action=… in the address
+// bar and a refresh re-submits — re-posting the password after a login, or the
+// delete after a removal.
+if (loginResult?.data?.ok || logoutResult?.data?.ok || removeResult?.data?.ok) {
+  return Astro.redirect('/admin');
+}
+
+const authed = await isAdmin(Astro.session);
+
+const loginError =
+  loginResult?.error && isActionError(loginResult.error) ? loginResult.error.message : null;
+
+// Only touch the store once past the gate.
+const data = authed
+  ? await Promise.all([listRsvps(), listAllWishes()]).then(([rsvps, wishes]) => ({
+      rsvps,
+      wishes,
+      stats: summarise(rsvps),
+    }))
+  : null;
+
+const tagClass: Record<string, string> = {
+  Hadir: 'tag--yes',
+  'Tidak Hadir': 'tag--no',
+  'Masih Ragu': 'tag--maybe',
+};
+---
+
+<Admin title={authed ? 'Dasbor' : 'Masuk'}>
+  {!authed && (
+    <main class="wrap">
+      <div class="login">
+        <p class="label">Adif &amp; Anggun</p>
+        <h1>Dasbor Undangan</h1>
+        <p>Masukkan kata sandi untuk melihat konfirmasi kehadiran dan ucapan.</p>
+
+        {loginError && <p class="error">{loginError}</p>}
+
+        {/* Plain form POST: no client JavaScript needed to sign in. */}
+        <form method="POST" action={actions.login}>
+          <label class="field">
+            <span>Kata Sandi</span>
+            <input
+              class="input"
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              required
+              autofocus
+            />
+          </label>
+          <p style="margin-top:28px">
+            <button class="btn btn--wide" type="submit">Masuk</button>
+          </p>
+        </form>
+      </div>
+    </main>
+  )}
+
+  {authed && data && (
+    <main class="admin">
+      <div class="wrap wrap--wide">
+        <header class="admin-head">
+          <div>
+            <p class="label">Adif &amp; Anggun</p>
+            <h1 class="admin-title">Dasbor Undangan</h1>
+          </div>
+          <form method="POST" action={actions.logout}>
+            <button class="btn btn--ghost btn--sm" type="submit">Keluar</button>
+          </form>
+        </header>
+
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-num">{data.stats.responses}</span>
+            <span class="stat-lab">Total Balasan</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">{data.stats.attending}</span>
+            <span class="stat-lab">Hadir</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">{data.stats.notAttending}</span>
+            <span class="stat-lab">Tidak Hadir</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">{data.stats.unsure}</span>
+            <span class="stat-lab">Masih Ragu</span>
+          </div>
+
+          <div class="stat stat--wide">
+            <span class="stat-num">{data.stats.attendingGuests}</span>
+            <span class="stat-lab">
+              Perkiraan jumlah tamu hadir
+              {data.stats.unsureGuests > 0 && ` · +${data.stats.unsureGuests} bila yang ragu ikut hadir`}
+            </span>
+          </div>
+        </div>
+
+        {data.stats.hasOpenEnded && (
+          <p class="admin-sub">
+            Catatan: sebagian tamu memilih &ldquo;5 orang atau lebih&rdquo;, jadi angka di atas
+            adalah perkiraan minimum.
+          </p>
+        )}
+
+        <h2>Konfirmasi Kehadiran</h2>
+        <p class="admin-sub">{data.rsvps.length} balasan, terbaru di atas.</p>
+
+        <div class="bar">
+          <a class="btn btn--ghost btn--sm" href="/admin/rsvp.csv" download>Unduh CSV</a>
+          <a class="btn btn--ghost btn--sm" href="/admin/wishes.csv" download>Unduh Ucapan CSV</a>
+        </div>
+
+        <div class="table-scroll">
+          {data.rsvps.length === 0 ? (
+            <p class="empty">Belum ada konfirmasi kehadiran.</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                  <th class="num">Jumlah</th>
+                  <th>Kehadiran</th>
+                  <th>Diundang Sebagai</th>
+                  <th>Waktu</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.rsvps.map((r) => (
+                  <tr>
+                    <td>{r.nama}</td>
+                    <td class="num">{r.jumlah}</td>
+                    <td>
+                      <span class={`tag ${tagClass[r.kehadiran] ?? ''}`}>{r.kehadiran}</span>
+                    </td>
+                    <td>{r.tamuUndangan ?? '—'}</td>
+                    <td>{adminTimeLabel(r.waktu)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        <h2>Ucapan &amp; Doa</h2>
+        <p class="admin-sub">{data.wishes.length} ucapan. Hapus yang tidak pantas di sini.</p>
+
+        <div class="table-scroll">
+          {data.wishes.length === 0 ? (
+            <p class="empty">Belum ada ucapan.</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                  <th>Ucapan</th>
+                  <th>Waktu</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.wishes.map((w) => (
+                  <tr>
+                    <td>{w.nama}</td>
+                    <td class="wrap-cell">{w.pesan}</td>
+                    <td>{adminTimeLabel(w.waktu)}</td>
+                    <td>
+                      <form method="POST" action={actions.removeWish} class="row-actions">
+                        <input type="hidden" name="key" value={w.id} />
+                        <button class="link-danger" type="submit">Hapus</button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </main>
+  )}
+</Admin>

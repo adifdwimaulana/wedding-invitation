@@ -1,0 +1,21 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+const items: { href: string; label: string; icon: IconName }[] = [
+  { href: '#mempelai', label: 'Mempelai', icon: 'heart' },
+  { href: '#acara', label: 'Acara', icon: 'calendar' },
+  { href: '#galeri', label: 'Galeri', icon: 'image' },
+  { href: '#rsvp', label: 'RSVP', icon: 'list' },
+  { href: '#hadiah', label: 'Hadiah', icon: 'gift' },
+];
+---
+
+{/* Hidden until the cover is dismissed; scripts/cover.ts adds .is-up */}
+<nav id="bottomnav" aria-label="Navigasi undangan">
+  {items.map((item) => (
+    <a href={item.href}>
+      <Icon name={item.icon} width={1.5} />
+      {item.label}
+    </a>
+  ))}
+</nav>

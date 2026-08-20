@@ -1,0 +1,30 @@
+---
+import Person from './Person.astro';
+import { wedding } from '../data/wedding';
+
+// [PLACEHOLDER] Replace both with real portraits from src/assets/.
+const groomPhoto = 'https://picsum.photos/seed/adif-portrait/900/1125';
+const bridePhoto = 'https://picsum.photos/seed/anggun-portrait/900/1125';
+---
+
+<section id="mempelai" class="section-pad">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="label">Mempelai</p>
+      <h2 class="h-sec">Kedua Calon</h2>
+      <div class="rule--short" aria-hidden="true"></div>
+    </div>
+
+    <div style="margin-top: clamp(40px, 9vw, 64px)">
+      <Person person={wedding.groom} side="groom" photo={groomPhoto} />
+    </div>
+
+    <div class="amp-div reveal" aria-hidden="true">
+      <div class="rule"></div>
+      <span>&amp;</span>
+      <div class="rule"></div>
+    </div>
+
+    <Person person={wedding.bride} side="bride" photo={bridePhoto} />
+  </div>
+</section>

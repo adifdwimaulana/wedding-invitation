@@ -1,0 +1,67 @@
+---
+import Icon from './Icon.astro';
+import { wedding } from '../data/wedding';
+---
+
+<section id="hadiah" class="section-pad tinted">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="label">Amplop Digital</p>
+      <h2 class="h-sec">Kirim Hadiah</h2>
+      <p class="lede">
+        Doa dan kehadiran Anda adalah hadiah terindah bagi kami. Namun apabila Anda ingin
+        memberikan tanda kasih, kami menyediakan amplop digital berikut.
+      </p>
+
+      <p class="disclose">
+        <button
+          class="btn btn--ghost"
+          type="button"
+          id="giftToggle"
+          aria-expanded="false"
+          aria-controls="giftPanel"
+        >
+          <Icon name="gift" />
+          <span id="giftToggleText">Tampilkan Rekening</span>
+        </button>
+      </p>
+    </div>
+
+    <div class="disclose-panel" id="giftPanel">
+      <div>
+        <div class="gifts" style="padding-top:26px">
+          {wedding.gifts.map((account, i) => (
+            <div class="gift">
+              <p class="gift-bank">{account.bank}</p>
+              <p class="gift-no" id={`acc${i + 1}`}>{account.number}</p>
+              <p class="gift-name">a.n. {account.holder}</p>
+              <button
+                class="btn btn--ghost btn--sm"
+                type="button"
+                data-copy={`acc${i + 1}`}
+                data-label="Nomor rekening"
+              >
+                Salin
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div class="gift" style="margin-top:16px">
+          <p class="gift-bank">Kirim Hadiah Fisik</p>
+          <p style="margin:12px 0 0" id="addr1">{wedding.giftAddress}</p>
+          <p style="margin-top:20px">
+            <button
+              class="btn btn--ghost btn--sm"
+              type="button"
+              data-copy="addr1"
+              data-label="Alamat"
+            >
+              Salin Alamat
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

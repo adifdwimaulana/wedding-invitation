@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22.20.0"
+
+# Netlify's Image CDN keeps its own allowlist, separate from Astro's
+# image.remotePatterns. Without an entry here every remote image 403s with
+# "Remote image URL not allowed".
+# [PLACEHOLDER] Delete this block once the photos live in src/assets/.
+[images]
+  remote_images = ["https://picsum\\.photos/.*"]
+
+# The invitation is private; keep it out of search results.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

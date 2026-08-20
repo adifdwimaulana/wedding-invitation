@@ -1,0 +1,38 @@
+---
+import Icon from './Icon.astro';
+import { mapsEmbedUrl } from '../lib/format';
+import { wedding } from '../data/wedding';
+
+const embed = mapsEmbedUrl();
+---
+
+<section id="lokasi" class="section-pad tinted">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="label">Lokasi</p>
+      <h2 class="h-sec">{wedding.venue}</h2>
+      <p class="addr">
+        {wedding.addressLines.map((line, i) => (
+          <>{i > 0 && <br />}{line}</>
+        ))}
+      </p>
+    </div>
+
+    <div class="map-frame reveal">
+      <iframe
+        title={`Peta lokasi ${wedding.venue}`}
+        src={embed}
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen
+      ></iframe>
+    </div>
+
+    <p class="center reveal" style="margin-top:26px">
+      <a class="btn btn--ghost" href={wedding.mapsUrl} target="_blank" rel="noopener noreferrer">
+        <Icon name="pin" />
+        Buka Google Maps
+      </a>
+    </p>
+  </div>
+</section>

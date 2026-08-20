@@ -1,0 +1,46 @@
+---
+import { listWishes, type WishRecord } from '../lib/blobs';
+import { wishTimeLabel } from '../lib/time';
+
+/**
+ * Server island (rendered via server:defer from Guestbook.astro) so the rest
+ * of the invitation stays static and CDN-cached while this list stays fresh.
+ *
+ * Reads are eventually consistent and can lag by up to a minute; the submitter
+ * sees their own wish immediately via an optimistic prepend in scripts/forms.ts.
+ */
+let wishes: WishRecord[] = [];
+let unavailable = false;
+
+try {
+  wishes = await listWishes();
+} catch {
+  // Blobs is not available under plain `astro dev` — use `netlify dev`.
+  unavailable = true;
+}
+
+// Nothing here carries .reveal: island content arrives after the page-level
+// IntersectionObserver has already been set up, so it would never be revealed.
+---
+
+<p class="wishes-count"><span id="wishCount">{wishes.length}</span> Ucapan</p>
+
+<div class="wishes" id="wishList">
+  {unavailable && (
+    <p class="wishes-empty">Buku tamu belum tersedia. Muat ulang sebentar lagi.</p>
+  )}
+
+  {!unavailable && wishes.length === 0 && (
+    <p class="wishes-empty" id="wishEmpty">Belum ada ucapan. Jadilah yang pertama.</p>
+  )}
+
+  {wishes.map((wish) => (
+    <article class="wish">
+      <div class="wish-head">
+        <h3 class="wish-name">{wish.nama}</h3>
+        <span class="wish-time">{wishTimeLabel(wish.waktu)}</span>
+      </div>
+      <p class="wish-body">{wish.pesan}</p>
+    </article>
+  ))}
+</div>

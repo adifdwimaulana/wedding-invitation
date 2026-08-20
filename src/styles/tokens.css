@@ -1,0 +1,52 @@
+/* ============================================================
+   TOKENS — sage & olive over a warm off-white.
+   Components read only these variables, which is what lets
+   .invert flip a whole section to dark olive for free.
+   ============================================================ */
+:root {
+  /* Surfaces */
+  --paper:  #FBFAF6;  /* page background, warm off-white */
+  --white:  #FFFFFF;  /* cards — the white accent that anchors the palette */
+  --mist:   #EEF2E9;  /* pale sage wash for alternating sections */
+  --cream:  #F4F1E6;  /* warm fill */
+
+  /* Sage / olive ramp */
+  --sage-100: #DCE6D3;
+  --sage-200: #C2D2B6;
+  --sage-400: #8CA67E;
+  --sage-600: #66805A;
+  --olive:    #3F5236;
+  --olive-900:#243019;
+
+  /* Gold — used sparingly, for dividers and small marks only */
+  --gold:     #BFA269;
+  --gold-100: #EADFC6;
+
+  /* Text */
+  --ink:   #1E2619;  /* primary */
+  --muted: #5C6B52;  /* secondary */
+  --soft:  #8B9880;  /* tertiary, small labels */
+  --line:  #DFE5D6;  /* hairlines */
+
+  --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono:  ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --nav-h: 62px;
+  --pad:   24px;
+  --max:   660px;
+  --ease:  cubic-bezier(.22,.61,.36,1);
+}
+
+/* Dark olive block. Redefining the tokens re-skins every child component. */
+.invert {
+  --paper:  var(--olive-900);
+  --white:  rgba(255,255,255,.055);
+  --mist:   rgba(255,255,255,.05);
+  --ink:    #F4F2E7;
+  --muted:  rgba(244,242,231,.74);
+  --soft:   var(--sage-200);
+  --line:   rgba(244,242,231,.18);
+  background: var(--paper);
+  color: var(--ink);
+}

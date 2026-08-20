@@ -1,0 +1,25 @@
+---
+import Countdown from './Countdown.astro';
+import Icon from './Icon.astro';
+import { googleCalendarUrl } from '../lib/format';
+import { wedding } from '../data/wedding';
+
+const calendarUrl = googleCalendarUrl();
+---
+
+<section id="tanggal" class="section-pad invert">
+  <div class="wrap center reveal" data-stagger="110">
+    <p class="label">Save The Date</p>
+    <p class="date-big">Minggu,<br />25 Oktober 2026</p>
+    <p class="date-sub">{wedding.venue}</p>
+
+    <Countdown />
+
+    <p style="margin-top:34px">
+      <a class="btn btn--ghost" href={calendarUrl} target="_blank" rel="noopener noreferrer">
+        <Icon name="calendar" />
+        Simpan ke Kalender
+      </a>
+    </p>
+  </div>
+</section>

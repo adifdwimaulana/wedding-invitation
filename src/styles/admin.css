@@ -1,0 +1,111 @@
+/* ============================================================
+   ADMIN — denser and more utilitarian than the invitation, but
+   reuses the same tokens so it still looks related.
+   ============================================================ */
+.admin {
+  min-height: 100vh;
+  padding: clamp(28px, 6vw, 56px) 0 80px;
+  background: var(--paper);
+}
+
+.admin-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+  padding-bottom: 22px; margin-bottom: 34px;
+  border-bottom: 1px solid var(--line);
+}
+.admin-title { font-family: var(--serif); font-size: clamp(27px, 6vw, 36px); color: var(--olive); margin: 8px 0 0; line-height: 1.1; }
+
+/* ---- Login ---- */
+.login {
+  max-width: 380px; margin: clamp(40px, 14vh, 120px) auto;
+  padding: 34px 30px;
+  border: 1px solid var(--line); border-radius: 3px; background: var(--white);
+  box-shadow: 0 1px 2px rgba(36,48,25,.03), 0 14px 34px -26px rgba(36,48,25,.28);
+}
+.login h1 { font-family: var(--serif); font-weight: 400; font-size: 27px; color: var(--olive); margin: 10px 0 0; }
+.login p { color: var(--muted); font-weight: 300; font-size: 14px; margin: 10px 0 0; }
+
+.error {
+  margin-top: 22px; padding: 12px 16px;
+  border-left: 2px solid #A6402F;
+  background: #FBF2F0; color: #7E2E20;
+  font-size: 13.5px;
+}
+.invert .error { background: rgba(166,64,47,.14); color: #F3C9C1; }
+
+/* ---- Stat cards ---- */
+.stats {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 34px;
+}
+.stat {
+  padding: 20px 18px;
+  border: 1px solid var(--line); border-radius: 3px; background: var(--white);
+}
+.stat-num {
+  display: block;
+  font-family: var(--mono); font-variant-numeric: tabular-nums;
+  font-size: clamp(26px, 6.5vw, 34px); line-height: 1;
+  color: var(--olive);
+}
+.stat-lab {
+  display: block; margin-top: 10px;
+  font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--soft);
+}
+.stat--wide { grid-column: span 2; background: var(--mist); }
+.stat--wide .stat-num { color: var(--olive-900); }
+
+/* ---- Tables ---- */
+.admin h2 {
+  font-family: var(--serif); font-weight: 400; font-size: 23px;
+  color: var(--olive); margin: 44px 0 0;
+}
+.admin-sub { color: var(--muted); font-weight: 300; font-size: 13.5px; margin: 6px 0 0; }
+
+.table-scroll {
+  margin-top: 18px; overflow-x: auto;
+  border: 1px solid var(--line); border-radius: 3px; background: var(--white);
+  -webkit-overflow-scrolling: touch;
+}
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { padding: 12px 14px; text-align: left; vertical-align: top; white-space: nowrap; }
+th {
+  font-size: 9.5px; font-weight: 500;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--sage-600);
+  background: var(--mist);
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+}
+td { border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+td.wrap-cell { white-space: normal; min-width: 240px; }
+td.num, th.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.tag {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  font-size: 10.5px; letter-spacing: .06em;
+  border: 1px solid var(--line);
+}
+.tag--yes { background: var(--sage-100); border-color: var(--sage-200); color: var(--olive); }
+.tag--no  { background: #F6F1EE; border-color: #E4D7D0; color: #8A5443; }
+.tag--maybe { background: var(--cream); border-color: var(--gold-100); color: #8A7433; }
+
+.empty { padding: 34px 16px; text-align: center; color: var(--soft); font-weight: 300; }
+
+.row-actions { display: flex; gap: 8px; }
+.link-danger {
+  background: none; border: 0; padding: 0;
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: #A6402F; text-decoration: underline; text-underline-offset: 3px;
+}
+
+.bar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+@media (min-width: 768px) {
+  .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .stat--wide { grid-column: span 4; }
+}

@@ -1,0 +1,86 @@
+---
+import { actions } from 'astro:actions';
+
+const counts = [
+  { value: '1', label: '1 orang' },
+  { value: '2', label: '2 orang' },
+  { value: '3', label: '3 orang' },
+  { value: '4', label: '4 orang' },
+  { value: '5', label: '5 orang atau lebih' },
+];
+
+const attendance = ['Hadir', 'Tidak Hadir', 'Masih Ragu'];
+---
+
+<section id="rsvp" class="section-pad tinted">
+  <div class="wrap">
+    <div class="center reveal">
+      <p class="label">RSVP</p>
+      <h2 class="h-sec">Konfirmasi Kehadiran</h2>
+      <p class="lede">
+        Mohon konfirmasi kehadiran Anda agar kami dapat mempersiapkan tempat dengan baik.
+      </p>
+    </div>
+
+    <div class="card form-card reveal" id="rsvpCard">
+      {/* action= is set so the endpoint is discoverable, but submission is
+          intercepted in scripts/forms.ts to keep this page prerendered. */}
+      <form id="rsvpForm" method="POST" action={actions.rsvp}>
+        <label class="field" style="margin-top:0">
+          <span>Nama</span>
+          <input
+            class="input"
+            type="text"
+            name="nama"
+            id="rsvpNama"
+            placeholder="Nama lengkap Anda"
+            autocomplete="name"
+            maxlength="80"
+            required
+          />
+        </label>
+
+        <label class="field">
+          <span>Jumlah Tamu</span>
+          <select class="input" name="jumlah" id="rsvpJumlah">
+            {counts.map((c) => <option value={c.value}>{c.label}</option>)}
+          </select>
+        </label>
+
+        <div class="field">
+          <span>Kehadiran</span>
+          <div class="pills">
+            {attendance.map((option, i) => (
+              <label class="pill">
+                <input type="radio" name="kehadiran" value={option} checked={i === 0} />
+                {option}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Populated on the client from ?to=, so a reply maps back to the invite. */}
+        <input type="hidden" name="tamuUndangan" id="rsvpTamu" value="" />
+
+        <div class="trap" aria-hidden="true">
+          <label>
+            Jangan diisi
+            <input type="text" name="honeypot" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
+
+        <p style="margin-top:34px">
+          <button class="btn btn--wide" type="submit" id="rsvpSubmit">Kirim Konfirmasi</button>
+        </p>
+      </form>
+    </div>
+
+    <div class="state-msg reveal" id="rsvpThanks" hidden>
+      <h3>Terima kasih</h3>
+      <p>
+        Konfirmasi kehadiran Anda telah kami terima. Kami sangat menantikan kehadiran Anda di
+        hari bahagia kami.
+      </p>
+    </div>
+  </div>
+</section>

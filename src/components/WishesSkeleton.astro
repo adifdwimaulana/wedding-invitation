@@ -1,0 +1,16 @@
+---
+// Fallback shown while the wishes island loads. Matches the real list's
+// rhythm so the swap-in does not shift the page.
+const rows = [0, 1, 2];
+---
+
+<p class="wishes-count">&nbsp;</p>
+
+<div class="wishes">
+  {rows.map(() => (
+    <div class="wish-skel">
+      <span></span>
+      <span></span>
+    </div>
+  ))}
+</div>

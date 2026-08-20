@@ -1,0 +1,50 @@
+---
+import Base from '../layouts/Base.astro';
+
+import BottomNav from '../components/BottomNav.astro';
+import Closing from '../components/Closing.astro';
+import Couple from '../components/Couple.astro';
+import Cover from '../components/Cover.astro';
+import Events from '../components/Events.astro';
+import Gallery from '../components/Gallery.astro';
+import Gifts from '../components/Gifts.astro';
+import Guestbook from '../components/Guestbook.astro';
+import Lightbox from '../components/Lightbox.astro';
+import Location from '../components/Location.astro';
+import MusicToggle from '../components/MusicToggle.astro';
+import Quote from '../components/Quote.astro';
+import RsvpForm from '../components/RsvpForm.astro';
+import SaveTheDate from '../components/SaveTheDate.astro';
+
+import { coupleNames, wedding } from '../data/wedding';
+---
+
+<Base>
+  <Cover />
+
+  <main id="top">
+    <Quote />
+    <Couple />
+    <SaveTheDate />
+    <Events />
+    <Location />
+    <Gallery />
+    <RsvpForm />
+    <Guestbook />
+    <Gifts />
+    <Closing />
+
+    <footer class="invert">
+      <div class="wrap">
+        <p>{coupleNames} &middot; {wedding.dateLabel.replace('Minggu, ', '')}</p>
+      </div>
+    </footer>
+  </main>
+
+  <BottomNav />
+  <MusicToggle />
+  <Lightbox />
+
+  {/* Copy and share confirmations */}
+  <div id="toast" role="status" aria-live="polite"></div>
+</Base>

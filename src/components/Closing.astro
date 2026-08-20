@@ -1,0 +1,35 @@
+---
+import Icon from './Icon.astro';
+import { coupleNames, wedding } from '../data/wedding';
+---
+
+<section id="penutup" class="section-pad">
+  <div class="wrap center reveal" data-stagger="100">
+    <p class="label">Penutup</p>
+    <p class="closing">
+      Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i
+      berkenan hadir untuk memberikan doa restu kepada kedua mempelai. Atas kehadiran serta
+      doa yang diberikan, kami sampaikan terima kasih yang sebesar-besarnya. Semoga Allah
+      Subhanahu Wa Ta'ala membalas segala kebaikan Bapak/Ibu/Saudara/i.
+    </p>
+
+    <p class="salam">Wassalamu'alaikum<br />Warahmatullahi Wabarakatuh</p>
+
+    <div class="rule--short" aria-hidden="true"></div>
+
+    <p class="closing-names">{coupleNames}</p>
+
+    <p class="families">
+      Turut mengundang<br />
+      Keluarga Bapak {wedding.groom.father}<br />
+      Keluarga Bapak {wedding.bride.father}
+    </p>
+
+    <p style="margin-top:40px">
+      <button class="btn btn--ghost" type="button" id="shareBtn">
+        <Icon name="share" />
+        Bagikan Undangan
+      </button>
+    </p>
+  </div>
+</section>

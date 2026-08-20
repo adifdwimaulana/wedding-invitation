@@ -1,0 +1,12 @@
+---
+import Icon from './Icon.astro';
+---
+
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Pratinjau foto">
+  <button class="lb-close" type="button" id="lbClose" aria-label="Tutup pratinjau">
+    <Icon name="close" width={1.8} />
+  </button>
+  {/* No src attribute: src="" resolves to the page URL and fires a wasted
+      request on every load. It is set when the lightbox opens. */}
+  <img id="lbImg" alt="" />
+</div>

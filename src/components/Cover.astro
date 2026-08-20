@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import { wedding } from '../data/wedding';
+
+// [PLACEHOLDER] Replace with the real cover photo, ideally imported from
+// src/assets/cover.jpg so it is optimized at build time and the
+// image.remotePatterns entry in astro.config.mjs can be deleted.
+const cover = 'https://picsum.photos/seed/adifanggun-cover/1400/2000';
+---
+
+<div id="cover">
+  {/* An <Image> rather than a CSS background, so it goes through astro:assets. */}
+  <div class="bg">
+    <Image
+      src={cover}
+      alt=""
+      width={1400}
+      height={2000}
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+  <div class="veil"></div>
+
+  <div class="inner" data-stagger="140">
+    <p class="label">Undangan Pernikahan</p>
+
+    <h1 class="display cover-names">
+      {wedding.groom.first}
+      <span class="amp">&amp;</span>
+      {wedding.bride.first}
+    </h1>
+
+    <p class="cover-date">{wedding.dateLabel}</p>
+
+    <div class="cover-hair" aria-hidden="true"></div>
+
+    <p class="cover-to">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+    {/* Filled in from the ?to= query string on the client. */}
+    <p class="cover-guest" id="guestName">{wedding.fallbackGuest}</p>
+
+    <button class="btn" id="openBtn" type="button">Buka Undangan</button>
+  </div>
+</div>
