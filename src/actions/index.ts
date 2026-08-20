@@ -1,7 +1,8 @@
 import { defineAction, ActionError } from 'astro:actions';
 // astro/zod, not astro:schema — the latter is deprecated as of Astro 6.
 import { z } from 'astro/zod';
-import { putRsvp, putWish } from '../lib/blobs';
+import { deleteWish, putRsvp, putWish } from '../lib/blobs';
+import { ADMIN_SESSION_KEY, isAdmin, verifyPassword } from '../lib/auth';
 
 /**
  * Empty form fields arrive as null, not "". Without the preprocess step a blank
@@ -58,6 +59,44 @@ export const server = {
       // reads eventually-consistent data, which can lag by up to a minute.
       const wish = await putWish(input);
       return { ok: true as const, wish };
+    },
+  }),
+
+  login: defineAction({
+    accept: 'form',
+    input: z.object({ password: z.string().max(200).catch('') }),
+    handler: async ({ password }, context) => {
+      if (!(await verifyPassword(password))) {
+        // Slows credential stuffing a little. Serverless functions give no
+        // shared counter to rate-limit against, so this and a strong password
+        // are the whole defence.
+        await new Promise((resolve) => setTimeout(resolve, 700));
+        throw new ActionError({ code: 'UNAUTHORIZED', message: 'Kata sandi salah' });
+      }
+
+      context.session?.set(ADMIN_SESSION_KEY, true);
+      return { ok: true as const };
+    },
+  }),
+
+  logout: defineAction({
+    accept: 'form',
+    handler: async (_input, context) => {
+      context.session?.destroy();
+      return { ok: true as const };
+    },
+  }),
+
+  removeWish: defineAction({
+    accept: 'form',
+    input: z.object({ key: z.string().min(1).max(200) }),
+    handler: async ({ key }, context) => {
+      if (!(await isAdmin(context.session))) {
+        throw new ActionError({ code: 'UNAUTHORIZED', message: 'Tidak diizinkan' });
+      }
+
+      await deleteWish(key);
+      return { ok: true as const };
     },
   }),
 };

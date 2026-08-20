@@ -65,25 +65,54 @@ export async function putWish(input: { nama: string; pesan: string }): Promise<W
  * into an archive blob rather than raising the cap.
  */
 export async function listWishes(limit = 50): Promise<WishRecord[]> {
-  const store = wishStore();
+  return listNewest(wishStore(), limit);
+}
+
+export async function countWishes(): Promise<number> {
+  const { blobs } = await wishStore().list();
+  return blobs.length;
+}
+
+/** Every RSVP, newest first. Unbounded — the admin page needs exact totals. */
+export async function listRsvps(): Promise<RsvpRecord[]> {
+  return listNewest(rsvpStore(), Infinity);
+}
+
+export async function listAllWishes(): Promise<WishRecord[]> {
+  return listNewest(wishStore(), Infinity);
+}
+
+export async function deleteWish(key: string): Promise<void> {
+  await wishStore().delete(key);
+}
+
+/**
+ * Shared read path. list() returns keys without values, so reading N records
+ * costs N+1 round trips; the gets run in parallel and keys sort by their ISO
+ * timestamp prefix, so ordering never needs the values.
+ */
+async function listNewest<T extends object>(
+  store: ReturnType<typeof getStore>,
+  limit: number,
+): Promise<T[]> {
   const { blobs } = await store.list();
 
   const newest = blobs
     .map((b) => b.key)
     .sort()
     .reverse()
-    .slice(0, limit);
+    .slice(0, limit === Infinity ? undefined : limit);
 
-  const records = await Promise.all(
-    newest.map((key) =>
-      store.get(key, { type: 'json' }).catch(() => null) as Promise<WishRecord | null>,
-    ),
+  const records: (T | null)[] = await Promise.all(
+    newest.map(async (key) => {
+      try {
+        return ((await store.get(key, { type: 'json' })) ?? null) as T | null;
+      } catch {
+        // A record deleted between list() and get() is not an error here.
+        return null;
+      }
+    }),
   );
 
-  return records.filter((r): r is WishRecord => r !== null);
-}
-
-export async function countWishes(): Promise<number> {
-  const { blobs } = await wishStore().list();
-  return blobs.length;
+  return records.filter((record): record is T => record !== null);
 }

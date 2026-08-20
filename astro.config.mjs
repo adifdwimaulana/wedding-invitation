@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 import netlify from '@astrojs/netlify';
 
 export default defineConfig({
@@ -16,6 +16,15 @@ export default defineConfig({
   // Astro 7 defaults this to 'jsx', which drops whitespace between inline
   // elements and would visibly close up gaps in the ported markup.
   compressHTML: true,
+
+  env: {
+    schema: {
+      // Gates /admin. Validated at runtime, not build time, so a deploy that
+      // forgets it fails closed with a 500 on /admin rather than letting
+      // anyone in.
+      ADMIN_PASSWORD: envField.string({ context: 'server', access: 'secret' }),
+    },
+  },
 
   image: {
     layout: 'constrained',

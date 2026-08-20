@@ -53,6 +53,7 @@ grep -rn "PLACEHOLDER\|\[Nama" src/ astro.config.mjs netlify.toml
 
 Before sending invitations:
 
+- [ ] `ADMIN_PASSWORD` set locally and in Netlify (see below)
 - [ ] Parents' names for both families
 - [ ] Real Instagram handles, or delete the `instagram` lines to hide the links
 - [ ] Real bank account numbers and holders, and the physical gift address
@@ -88,19 +89,37 @@ One blob per record rather than appending to a shared array is deliberate. Blobs
 
 Reads are eventually consistent and can lag by up to a minute, so the guestbook renders as a deferred server island while the rest of the page stays static and CDN-cached. A guest sees their own wish immediately via an optimistic prepend.
 
-### Reading the data
+### Reading the data — the admin dashboard
 
-There is no admin page. Use the Netlify CLI:
+Go to **`/admin`** and sign in with `ADMIN_PASSWORD`. It shows:
+
+- Totals: replies, attending, not attending, unsure, and the estimated head count
+- Every RSVP, newest first, with the name each guest was invited under
+- Every wish, with a **Hapus** button for moderation
+- **Unduh CSV** for both tables, ready for Excel or Sheets
+
+The head count sums the party size of everyone who answered *Hadir*. Because the largest option is "5 orang atau lebih", the dashboard flags the total as a minimum whenever anyone picked it.
+
+The whole dashboard works without JavaScript — it is plain form posts.
+
+Set the password before deploying:
+
+```bash
+cp .env.example .env
+openssl rand -base64 24     # paste into ADMIN_PASSWORD
+```
+
+Then add the same `ADMIN_PASSWORD` in Netlify under **Site configuration → Environment variables**. If it is missing, `/admin` fails closed with a 500 rather than letting anyone in.
+
+**On the strength of this gate:** it is one shared password against the whole guest list's RSVP data, with no rate limiting — serverless functions share no counter to throttle against, so a failed attempt just costs a fixed delay. Use a long random password, not a memorable one.
+
+The CLI still works if you prefer it:
 
 ```bash
 netlify blobs:list rsvp
 netlify blobs:get rsvp <key>
-netlify blobs:list wishes
+netlify blobs:delete wishes <key>
 ```
-
-**This is the main practical gap.** Counting RSVPs means listing keys and fetching each one by hand. If you want a real count before invitations go out, say so and it can be built.
-
-To delete an inappropriate wish: `netlify blobs:delete wishes <key>`.
 
 ---
 
@@ -111,7 +130,7 @@ netlify init      # first time only
 git push          # Netlify builds from the repo
 ```
 
-Netlify needs no environment variables for Blobs — the adapter wires them up. Astro generates an `ASTRO_KEY` for the server island automatically at build time.
+Blobs needs no configuration — the adapter wires it up, and Astro generates an `ASTRO_KEY` for the server island at build time. The one variable you must set yourself is `ADMIN_PASSWORD`.
 
 `netlify.toml` sets `X-Robots-Tag: noindex, nofollow` and the page carries `<meta name="robots" content="noindex">`, so the invitation stays out of search results. That is obscurity, not access control: anyone with the link can open it, which matters because the page shows real bank account numbers.
 
@@ -130,6 +149,11 @@ Styles are global rather than component-scoped on purpose. The design relies on 
 
 ## What is verified and what is not
 
-Verified locally under `netlify dev`: guest-name injection, both form submissions, validation messages, honeypot rejection, guestbook persistence and ordering, XSS safety (a stored `<img src=x onerror=…>` payload renders as inert text), the countdown, the lightbox including scroll restoration, the gift panel, clipboard copy, and bottom-nav scroll spying. Astro's own audit reports no accessibility or performance issues.
+Verified locally under `netlify dev`, against both the dev server and the production build:
+
+- **Invitation** — guest-name injection, both form submissions, validation messages, honeypot rejection, guestbook persistence and ordering, XSS safety (a stored `<img src=x onerror=…>` payload renders as inert text), the countdown, the lightbox including scroll restoration, the gift panel, clipboard copy, and bottom-nav scroll spying.
+- **Admin** — wrong password rejected, correct password admitted, session surviving reload and a server restart, logout genuinely destroying the session, a forged session cookie refused, CSV endpoints returning 401 without a session, delete-wish refused without a session, and CSV formula injection defused (`+CMD|…` exported as inert text).
+
+Astro's own audit reports no accessibility or performance issues on either page.
 
 **Not yet verified:** the real WhatsApp link preview on iOS and Android, which needs a live deploy.

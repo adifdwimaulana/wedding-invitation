@@ -14,3 +14,15 @@ export function wishTimeLabel(iso: string): string {
     minute: '2-digit',
   });
 }
+
+/** Includes the year, since the admin table is read long after the fact. */
+export function adminTimeLabel(iso: string): string {
+  return new Date(iso).toLocaleString('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}

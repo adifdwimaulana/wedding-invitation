@@ -574,11 +574,24 @@ Netlify functions run in UTC, so `toLocaleString('id-ID')` in the server island 
 
 Rather than importing `wedding.ts` into the client bundle, `Countdown.astro` renders `data-start` and `scripts/countdown.ts` reads it. The rendered date and the countdown target cannot drift apart, and the content module stays out of the client payload.
 
-### 17.7 Deferred from this pass
+### 17.7 Admin dashboard
+
+§16's first open question — the couple cannot count RSVPs — is now closed. `/admin` is on-demand rendered and gated by a single `ADMIN_PASSWORD`, declared through `astro:env` as a server secret so a deploy that forgets it fails closed with a 500 rather than admitting everyone.
+
+Notes on the implementation:
+
+- **Sessions come free.** The Netlify adapter already enables Blobs-backed sessions (it prints `Enabling sessions with Netlify Blobs` on every build), so `Astro.session` needs no setup and no hand-rolled signed cookie. The cookie is `HttpOnly; SameSite=Lax`.
+- **Constant-time comparison.** `verifyPassword` compares SHA-256 digests rather than the raw strings, so the loop always runs over 32 bytes instead of returning at the first differing character and leaking the shared prefix length.
+- **POST-redirect-GET is required, not cosmetic.** Astro renders form-action results in the same request, which leaves `?_action=login` in the address bar; a refresh then re-posts the password, and after a deletion re-posts the delete. The page redirects to `/admin` on any successful action. Failures deliberately do not redirect, so the error stays renderable.
+- **CSV formula injection.** A guest controls their own name and message, both of which land in an export the couple open in Excel or Sheets. A cell beginning `= + - @` is executed there, so `lib/csv.ts` prefixes those with an apostrophe. It also emits a BOM, without which Indonesian names arrive mangled in Excel.
+- **No rate limiting.** Serverless invocations share no counter, so a failed login only costs a fixed 700 ms delay. The real defence is a long random password; this is documented in the README rather than papered over.
+- **Head counts are a lower bound.** The largest party-size option is "5 orang atau lebih", so `summarise()` reports `hasOpenEnded` and the dashboard says so explicitly rather than presenting a precise-looking total.
+
+### 17.8 Deferred from this pass
 
 - **Phase 6** is partly done: the image pipeline runs through `astro:assets` and the Netlify Image CDN, but the sources are still `picsum.photos` placeholders and the audio is still hotlinked. Swapping in real files is now a per-file change with no structural work.
 - **Phase 7** (deploy plus real WhatsApp verification on iOS and Android) needs a live deploy, so F10 and F13 remain unverified.
-- The open questions in §16 are unchanged. Admin access is still the practical gap: RSVPs are only readable via the Netlify CLI or dashboard.
+- Of the §16 open questions, admin access is resolved (§17.7). Retention, wish moderation and repo visibility are unchanged — though moderation now has a delete button rather than only a CLI command.
 
 ---
 
